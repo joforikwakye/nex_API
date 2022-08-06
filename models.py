@@ -88,6 +88,12 @@ class College(Base):
     parent = relationship("Student", back_populates="children")
 
     
+    def __repr__(self):
+        return f"""
+        username = {self.college_name}
+        """
+
+    
 
 # department table model
 class Department(Base):
@@ -99,6 +105,7 @@ class Department(Base):
 
     # many-to-one
     parent = relationship("College", back_populates="child")
+    
 
 
 # candidate table model
