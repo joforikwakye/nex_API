@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, String, Integer, ForeignKey, Column
+from sqlalchemy import create_engine, String, Integer, Date, ForeignKey, Column
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 
@@ -32,7 +32,7 @@ class Students(Base):
     last_name = Column('last_name', String(255), nullable=False)
     gender = Column('gender', String(255), nullable=False)
     phone_number = Column('phone_number', String(255), nullable=False)
-    dob = Column('dob', Integer, nullable=False)
+    dob = Column('dob', Date, nullable=False)
     level = Column('level', nullable=False)
     email = Column('email', String(255), nullable=False)
 
@@ -101,9 +101,11 @@ class Department(Base):
 
     # columns
     dept_id = Column('dept_id', Integer, primary_key=True, nullable=False)
-    college_id = Column('college_id', Integer, ForeignKey("college.id"))  # college reference
+    college_id = Column('college_id', Integer, ForeignKey("college.id"))  # college 
+    dept_name = Column('dept_name', String, nullable=False)
+    student_id = Column('student_id', Integer, ForeignKey("student.id"))
 
-    # many-to-one
+    # many-to-one relation
     parent = relationship("College", back_populates="child")
     
 
