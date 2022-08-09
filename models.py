@@ -41,9 +41,9 @@ class Students(Base):
     college = Column('college', String(255), nullable=False)
     department = Column('department', String(255), nullable=False)
 
-    # one-to-many relation
-    child1 = relationship("Images")
-    child2 = relationship("Candidates")
+    # one-to-one relation
+    child1 = relationship("Images", uselist=False)
+    child2 = relationship("Candidates", uselist=False)
 
 
     # class instance
@@ -68,6 +68,9 @@ class Images(Base):
     image_id = Column('image_id', Integer, primary_key=True, nullable=False)
     image_url = Column('image_url', String(255), nullable=False)
     student_id = Column('student_id', Integer, ForeignKey("student.student_id")) # student reference
+
+    # many-to-one relation
+    parent = relationship("Students", back_populates="child1")
     
 
     # class instance
@@ -83,6 +86,10 @@ class Candidates(Base):
     candidate_id = Column('candidate_id', Integer, primary_key=True)
     student_id = Column('student_id', Integer, ForeignKey("student.student_id")) # student reference
 
+    # many-to-one relation
+    parent = relationship("Students", back_populates="child2")
+    
+    
     # class instance
     def __init__(self):
         pass
