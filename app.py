@@ -1,35 +1,48 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from flask_restful import Api, Resource
+from flask_httpauth import HTTPBasicAuth
 from models import Candidates, session, Students, Images
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
+api = Api(app)
+auth = HTTPBasicAuth()
 
 
 
-# getting single student route
+# @app.route('/account/<id>', methods=['POST'])
+# def create_account(id, usrname, pwd):
+#     user = request.form[
+#         {
+#             "password": user.password
+
+#         }
+#     ]
+        
+
+
 @app.route('/student/<id>', methods=['GET'])
 def get_student(id):
     try:
         student = session.query(Students).filter_by(student_id=id).first()
         result = {
-        "username":student.username,
-        "first_name": student.first_name,
-        "last_name": student.last_name,
-        "gender": student.gender,
-        "phonenumber": student.phone_number,
-        "dob": student.dob,
-        "level": student.level,
-        "email": student.email,
-        "college": student.college,
-        "department": student.department
-    }
+            "username":student.username,
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+            "gender": student.gender,
+            "phonenumber": student.phone_number,
+            "dob": student.dob,
+            "level": student.level,
+            "email": student.email,
+            "college": student.college,
+            "department": student.department
+        }    
         return jsonify(result)
     except Exception as e:
         print(e)
     
-   
-       
-# getting all students route
+
+    
 @app.route('/students', methods=['GET'])
 def all_student():
     returnInfo = []
@@ -49,7 +62,7 @@ def all_student():
                     "college": student.college,
                     "department": student.department
                 }
-        )
+            )
         results = {
             "all students": returnInfo
         }
@@ -59,7 +72,6 @@ def all_student():
     
     
 
-# getting single image route
 @app.route('/image/<id>', methods=['GET'])
 def get_image(id):
     try:
@@ -94,7 +106,6 @@ def all_images():
 
     
 
-#g getting single candidate route
 @app.route('/candidate/<id>', methods=['GET'])
 def get_candidate(id):
     try:
@@ -108,7 +119,6 @@ def get_candidate(id):
 
     
 
-# getting all candidates route
 @app.route('/candidates', methods=['GET'])
 def all_candidates():
     returnInfo = []
@@ -126,8 +136,7 @@ def all_candidates():
         return jsonify(results)
     except Exception as e:
         print(e)
-    
-    
+
 
 
 if __name__ == '__main__':
