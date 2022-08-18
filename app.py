@@ -1,35 +1,73 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from flask_httpauth import HTTPBasicAuth
 from models import Candidates, session, Students, Images
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
+auth = HTTPBasicAuth()
+            
+
+@app.route('/login', methods=['POST'])
+def verify_password():
+    try:
+        username = request.json['username']
+        password = request.json['password']
+
+        student = session.query(Students).filter_by(username=username).first()
+        if student:
+            verify = check_password_hash(pwhash=student.password, password=password)
+            if verify:
+                return "True"
+            else:
+                return "False"
+        else:
+            return "Username does not exist"
+    except Exception as e:
+        print(e)
 
 
+@app.route('/student_update/<id>', methods=['PUT'])
+def update_student(id):
+    try:
+        student = session.query(Students).filter_by(student_id=id).first()
+        
+        if student:
+            password = request.json['password']
 
-# getting single student route
+            pwd_hash = generate_password_hash(password=password)
+            student.password = pwd_hash
+        
+            session.commit()
+        else:
+            print("Student does not exist")
+            
+    except Exception as e:
+        print(e)
+    
+
 @app.route('/student/<id>', methods=['GET'])
 def get_student(id):
     try:
         student = session.query(Students).filter_by(student_id=id).first()
         result = {
-        "username":student.username,
-        "first_name": student.first_name,
-        "last_name": student.last_name,
-        "gender": student.gender,
-        "phonenumber": student.phone_number,
-        "dob": student.dob,
-        "level": student.level,
-        "email": student.email,
-        "college": student.college,
-        "department": student.department
-    }
+            "username":student.username,
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+            "gender": student.gender,
+            "phonenumber": student.phone_number,
+            "dob": student.dob,
+            "level": student.level,
+            "email": student.email,
+            "college": student.college,
+            "department": student.department
+        }    
         return jsonify(result)
     except Exception as e:
         print(e)
     
-   
-       
-# getting all students route
+
+    
 @app.route('/students', methods=['GET'])
 def all_student():
     returnInfo = []
@@ -49,7 +87,7 @@ def all_student():
                     "college": student.college,
                     "department": student.department
                 }
-        )
+            )
         results = {
             "all students": returnInfo
         }
@@ -59,7 +97,6 @@ def all_student():
     
     
 
-# getting single image route
 @app.route('/image/<id>', methods=['GET'])
 def get_image(id):
     try:
@@ -94,7 +131,6 @@ def all_images():
 
     
 
-#g getting single candidate route
 @app.route('/candidate/<id>', methods=['GET'])
 def get_candidate(id):
     try:
@@ -108,7 +144,6 @@ def get_candidate(id):
 
     
 
-# getting all candidates route
 @app.route('/candidates', methods=['GET'])
 def all_candidates():
     returnInfo = []
@@ -126,8 +161,7 @@ def all_candidates():
         return jsonify(results)
     except Exception as e:
         print(e)
-    
-    
+
 
 
 if __name__ == '__main__':
