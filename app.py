@@ -1,25 +1,50 @@
 from flask import Flask, jsonify, request
-from flask_restful import Api, Resource
 from flask_httpauth import HTTPBasicAuth
 from models import Candidates, session, Students, Images
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
-api = Api(app)
 auth = HTTPBasicAuth()
+            
+
+@app.route('/login', methods=['POST'])
+def verify_password():
+    try:
+        username = request.json['username']
+        password = request.json['password']
+
+        student = session.query(Students).filter_by(username=username).first()
+        if student:
+            verify = check_password_hash(pwhash=student.password, password=password)
+            if verify:
+                return "True"
+            else:
+                return "False"
+        else:
+            return "Username does not exist"
+    except Exception as e:
+        print(e)
 
 
-
-# @app.route('/account/<id>', methods=['POST'])
-# def create_account(id, usrname, pwd):
-#     user = request.form[
-#         {
-#             "password": user.password
-
-#         }
-#     ]
+@app.route('/student_update/<id>', methods=['PUT'])
+def update_student(id):
+    try:
+        student = session.query(Students).filter_by(student_id=id).first()
         
+        if student:
+            password = request.json['password']
 
+            pwd_hash = generate_password_hash(password=password)
+            student.password = pwd_hash
+        
+            session.commit()
+        else:
+            print("Student does not exist")
+            
+    except Exception as e:
+        print(e)
+    
 
 @app.route('/student/<id>', methods=['GET'])
 def get_student(id):
