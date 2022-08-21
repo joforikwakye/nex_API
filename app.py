@@ -1,11 +1,9 @@
 from flask import Flask, jsonify, request
-from flask_httpauth import HTTPBasicAuth
 from models import Candidates, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
-auth = HTTPBasicAuth()
             
 
 @app.route('/login', methods=['POST'])
