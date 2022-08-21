@@ -7,27 +7,29 @@ app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
             
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login', methods=['POST'])
 def login():
     d = {}
-    if request.method == 'POST':
+    username = request.json['username']
+    password = request.json['password']
 
-        username = request.json['username']
-        password = request.json['password']
-
-        student = session.query(Students).filter_by(username=username).first()
-        if student is not None:
-            if student:
-                verify = check_password_hash(pwhash=student.password, password=password)
-            if verify:
-                d['status'] = 'Login successful'
-                return jsonify(d)
-            else:
-                d['status'] = 'Incorrect username or password'
-                return jsonify(d)
+    student = session.query(Students).filter_by(username=username).first()
+    if student is not None:
+        if student:
+            verify = check_password_hash(pwhash=student.password, password=password)
+        if verify:
+            result = {
+                'student_id': student.student_id
+            }
+            d['status'] = 'Login successful'
+            return jsonify(d,result)
         else:
-            d['status'] = 'Username or password does not exist'
+            d['status'] = 'Incorrect username or password'
             return jsonify(d)
+    else:
+        d['status'] = 'Username or password does not exist'
+        return jsonify(d)
+
     
 
 @app.route('/student_update/<id>', methods=['PUT'])
