@@ -1,3 +1,4 @@
+import json
 from flask import Flask, jsonify, request
 from models import Candidates, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,24 +7,28 @@ app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
             
 
-@app.route('/login', methods=['POST'])
-def verify_password():
-    try:
+@app.route('/login', methods=['GET','POST'])
+def login():
+    d = {}
+    if request.method == 'POST':
+
         username = request.json['username']
         password = request.json['password']
 
         student = session.query(Students).filter_by(username=username).first()
-        if student:
-            verify = check_password_hash(pwhash=student.password, password=password)
+        if student is not None:
+            if student:
+                verify = check_password_hash(pwhash=student.password, password=password)
             if verify:
-                return "True"
+                d['status'] = 'Login successful'
+                return jsonify(d)
             else:
-                return "False"
+                d['status'] = 'Incorrect username or password'
+                return jsonify(d)
         else:
-            return "Username does not exist"
-    except Exception as e:
-        print(e)
-
+            d['status'] = 'Username or password does not exist'
+            return jsonify(d)
+    
 
 @app.route('/student_update/<id>', methods=['PUT'])
 def update_student(id):
