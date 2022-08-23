@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
-            
+ 
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -14,23 +14,38 @@ def login():
     password = request.json['password']
 
     student = session.query(Students).filter_by(username=username).first()
-    if student is not None:
-        if student:
+    if student:
             verify = check_password_hash(pwhash=student.password, password=password)
-        if verify:
-            result = {
-                'student_id': student.student_id
-            }
-            d['status'] = 'Login successful'
-            return jsonify(d,result)
-        else:
-            d['status'] = 'Incorrect username or password'
-            return jsonify(d)
-    else:
-        d['status'] = 'Username or password does not exist'
-        return jsonify(d)
+            if verify:
+                result = {
+                    'student_id': student.student_id,
+                    'status': 'Login successful'
+                } 
+                return jsonify(result)
 
-    
+            else:    
+                    d['status'] = 'Incorrect username or password'
+                    return jsonify(d)
+    else:
+            d['status'] = 'Username does not exist'
+            return jsonify(d)
+
+
+@app.route('/student/<id>', methods=['GET'])
+def get_student(id):
+    try:
+        student_name = session.query(Students).filter_by(student_id=id).first()
+        student_image = session.query(Images).filter_by(student_id = id).first()
+
+        result = {
+           'first_name': student_name.first_name,
+           'image': student_image.image_url
+        }    
+        return jsonify(result)
+    except Exception as e:
+        print(e)
+
+
 
 @app.route('/student_update/<id>', methods=['PUT'])
 def update_student(id):
@@ -51,25 +66,7 @@ def update_student(id):
         print(e)
     
 
-@app.route('/student/<id>', methods=['GET'])
-def get_student(id):
-    try:
-        student = session.query(Students).filter_by(student_id=id).first()
-        result = {
-            "username":student.username,
-            "first_name": student.first_name,
-            "last_name": student.last_name,
-            "gender": student.gender,
-            "phonenumber": student.phone_number,
-            "dob": student.dob,
-            "level": student.level,
-            "email": student.email,
-            "college": student.college,
-            "department": student.department
-        }    
-        return jsonify(result)
-    except Exception as e:
-        print(e)
+
     
 
     
@@ -105,13 +102,13 @@ def all_student():
 @app.route('/image/<id>', methods=['GET'])
 def get_image(id):
     try:
-        image = session.query(Images).filter_by(image_id=id)
+        image = session.query(Images).filter_by(student_id=id).first()
         result = {
             "image_url": image.image_url
         }
         return jsonify(result)
     except Exception as e:
-        print(e)
+        return 'does not work'
     
     
 
@@ -167,6 +164,10 @@ def all_candidates():
     except Exception as e:
         print(e)
 
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 if __name__ == '__main__':
