@@ -79,23 +79,55 @@ def get_presidents():
     d = {}
     try:
 
-        presidents = session.query(Candidates).all()
+        persons = session.query(Students, Candidates, Images).join(Candidates).filter(
+            Students.student_id == Candidates.student_id, Students.student_id == Images.student_id, Candidates.position == "president")
 
-        for president in presidents:
-            d['postion'] = president.position == 'president'
+        for person in persons:
+            d['position'] = person.Candidates.position
+            returnInfo.append(
+                {
+                    "student_position": person.Candidates.position,
+                    "student_id": person.Students.student_id,
+                    "position": person.Candidates.position,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
 
-            if d['postion']:
-                returnInfo.append(
-                    {
-                        # "candidate_id": president.candidate_id,
-                        "student_id": president.student_id,
-                        # "position": president.position
-
-                    }
-                )
+                }
+            )
 
             d['results'] = returnInfo
-           
+
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+# A gen secretary route for returning all secretaries
+@app.route('/gen_sec', methods=['GET'])
+def get_gen_sec():
+    returnInfo = []
+    d = {}
+    try:
+
+        persons = session.query(Students, Candidates, Images).join(Candidates).filter(
+            Students.student_id == Candidates.student_id, Students.student_id == Images.student_id, Candidates.position == "general secretary")
+
+        for person in persons:
+            d['position'] = person.Candidates.position
+            returnInfo.append(
+                {
+                    "student_position": person.Candidates.position,
+                    "student_id": person.Students.student_id,
+                    "position": person.Candidates.position,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+
+                }
+            )
+
+            d['results'] = returnInfo
 
         return jsonify(d['results'])
     except Exception as e:
