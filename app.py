@@ -1,10 +1,14 @@
+from crypt import methods
+from tkinter import Image
+from turtle import position
 from flask import Flask, jsonify, request
 from models import Candidates, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
+from app import Candidates
 
 app = Flask(__name__)
 app = Flask(__name__.split('.')[0])
- 
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -14,31 +18,32 @@ def login():
 
     student = session.query(Students).filter_by(username=username).first()
     if student:
-            verify = check_password_hash(pwhash=student.password, password=password)
-            if verify:
-                result = {
-                    'student_id': student.student_id,
-                    'status': 'Login successful'
-                } 
-                return jsonify(result)
-            else:    
-                    d['status'] = 'Incorrect username or password'
-                    return jsonify(d)
-    else:
-            d['status'] = 'Username does not exist'
+        verify = check_password_hash(
+            pwhash=student.password, password=password)
+        if verify:
+            result = {
+                'student_id': student.student_id,
+                'status': 'Login successful'
+            }
+            return jsonify(result)
+        else:
+            d['status'] = 'Incorrect username or password'
             return jsonify(d)
+    else:
+        d['status'] = 'Username does not exist'
+        return jsonify(d)
 
 
 @app.route('/student/<id>', methods=['GET'])
 def get_student(id):
     try:
         student_name = session.query(Students).filter_by(student_id=id).first()
-        student_image = session.query(Images).filter_by(student_id = id).first()
+        student_image = session.query(Images).filter_by(student_id=id).first()
 
         result = {
-           'first_name': student_name.first_name,
-           'image': student_image.image_url
-        }    
+            'first_name': student_name.first_name,
+            'image': student_image.image_url
+        }
         return jsonify(result)
     except Exception as e:
         print(e)
@@ -47,20 +52,55 @@ def get_student(id):
 @app.route('/candidate/<id>', methods=['GET'])
 def get_candidate(id):
     try:
-        candidate = session.query(Candidates).filter_by(candidate_id=id).first()
+        candidate = session.query(Candidates).filter_by(
+            candidate_id=id).first()
         if candidate:
             related_student = candidate.student_id
-            student = session.query(Students).filter_by(student_id=related_student).first()
+            student = session.query(Students).filter_by(
+                student_id=related_student).first()
+            candidate_image = session.query(Images).filter_by(
+                student_id=related_student).first()
+
             if student:
                 info = {
                     "first_name": student.first_name,
                     "last_name": student.last_name,
-                    # "image_url": student.image_url
+                    "image_url": candidate_image.image_url
                 }
                 return jsonify(info)
     except Exception as e:
         print(e)
-    
+
+
+# A president route for returning all presidential candidates
+@app.route('/presidents', methods=['GET'])
+def get_presidents():
+    returnInfo = []
+    d = {}
+    try:
+
+        presidents = session.query(Candidates).all()
+
+        for president in presidents:
+            d['postion'] = president.position == 'president'
+
+            if d['postion']:
+                returnInfo.append(
+                    {
+                        # "candidate_id": president.candidate_id,
+                        "student_id": president.student_id,
+                        # "position": president.position
+
+                    }
+                )
+
+            d['results'] = returnInfo
+           
+
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
 
 @app.route('/students', methods=['GET'])
 def all_student():
@@ -70,7 +110,7 @@ def all_student():
         for student in students:
             returnInfo.append(
                 {
-                    "username":student.username,
+                    "username": student.username,
                     "first_name": student.first_name,
                     "last_name": student.last_name,
                     "gender": student.gender,
@@ -88,7 +128,7 @@ def all_student():
         return jsonify(results)
     except Exception as e:
         print(e)
-    
+
 
 @app.route('/image/<id>', methods=['GET'])
 def get_image(id):
@@ -100,8 +140,8 @@ def get_image(id):
         return jsonify(result)
     except Exception as e:
         return 'does not work'
-    
-    
+
+
 # getting all images route
 @app.route('/images', methods=['GET'])
 def all_images():
@@ -120,7 +160,7 @@ def all_images():
         return jsonify(results)
     except Exception as e:
         print(e)
-    
+
 
 @app.route('/candidates', methods=['GET'])
 def all_candidates():
@@ -145,17 +185,17 @@ def all_candidates():
 def update_student(id):
     try:
         student = session.query(Students).filter_by(student_id=id).first()
-        
+
         if student:
             password = request.json['password']
 
             pwd_hash = generate_password_hash(password=password)
             student.password = pwd_hash
-        
+
             session.commit()
         else:
             print("Student does not exist")
-            
+
     except Exception as e:
         print(e)
 

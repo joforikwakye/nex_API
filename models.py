@@ -75,6 +75,7 @@ class Candidates(Base):
 
     candidate_id = Column('candidate_id', Integer, primary_key=True)
     student_id = Column('student_id', Integer, ForeignKey("student.student_id")) # student reference
+    position = Column('position', String(255), nullable = 'False')
 
     parent = relationship("Students", back_populates="child2")
     
