@@ -49,29 +49,6 @@ def get_student(id):
         print(e)
 
 
-@app.route('/candidate/<id>', methods=['GET'])
-def get_candidate(id):
-    try:
-        candidate = session.query(Candidates).filter_by(
-            candidate_id=id).first()
-        if candidate:
-            related_student = candidate.student_id
-            student = session.query(Students).filter_by(
-                student_id=related_student).first()
-            candidate_image = session.query(Images).filter_by(
-                student_id=related_student).first()
-
-            if student:
-                info = {
-                    "first_name": student.first_name,
-                    "last_name": student.last_name,
-                    "image_url": candidate_image.image_url
-                }
-                return jsonify(info)
-    except Exception as e:
-        print(e)
-
-
 # A president route for returning all presidential candidates
 @app.route('/presidents', methods=['GET'])
 def get_presidents():
@@ -130,6 +107,53 @@ def get_gen_sec():
             d['results'] = returnInfo
 
         return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+# route for getting all financial secretary candidate info
+@app.route('/fin_sec', methods=['GET'])
+def get_fin_sec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Candidates, Images).join(Candidates).filter(
+            Students.student_id == Candidates.student_id, Students.student_id == Images.student_id, Candidates.position == "financial secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Candidates.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+@app.route('/candidate/<id>', methods=['GET'])
+def get_candidate(id):
+    try:
+        candidate = session.query(Candidates).filter_by(
+            candidate_id=id).first()
+        if candidate:
+            related_student = candidate.student_id
+            student = session.query(Students).filter_by(
+                student_id=related_student).first()
+            candidate_image = session.query(Images).filter_by(
+                student_id=related_student).first()
+
+            if student:
+                info = {
+                    "first_name": student.first_name,
+                    "last_name": student.last_name,
+                    "image_url": candidate_image.image_url
+                }
+                return jsonify(info)
     except Exception as e:
         print(e)
 
