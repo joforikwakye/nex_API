@@ -43,6 +43,7 @@ class Students(Base):
     child1 = relationship("Images", uselist=False)
     child2 = relationship("Candidates", uselist=False)
     child3 = relationship("Aces", uselist=False)
+    child4 = relationship("Biomed", uselist=False)
 
 
     def __init__(self, username, first_name, last_name, gender, phone_number, dob, level, email, college, department):
@@ -90,7 +91,15 @@ class Aces(Base):
     position = Column('position', String(255), nullable=False)
 
     parent = relationship("Students", back_populates="child3")
-    
+
+class Biomed(Base):
+    __tablename__ = "biomed"
+
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child4")
     
     def __init__(self):
         self.position = position
