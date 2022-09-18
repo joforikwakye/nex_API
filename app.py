@@ -2,7 +2,7 @@ from crypt import methods
 from tkinter import Image
 from turtle import position
 from flask import Flask, jsonify, request
-from models import Candidates, session, Students, Images
+from models import Aces, Candidates, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import Candidates
 
@@ -133,6 +133,32 @@ def get_fin_sec():
         return jsonify(d['results'])
     except Exception as e:
         print(e)
+
+
+@app.route('/aces_presidents', methods=['GET'])
+def get_aces_presidents():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Aces, Images).join(Aces).filter(
+            Students.student_id == Aces.student_id, Students.student_id == Images.student_id, Aces.position == "financial secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Aces.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+
 
 
 @app.route('/candidate/<id>', methods=['GET'])
