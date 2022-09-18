@@ -78,6 +78,9 @@ class Candidates(Base):
     position = Column('position', String(255), nullable = 'False')
 
     parent = relationship("Students", back_populates="child2")
+
+
+
     
     
     def __init__(self):
