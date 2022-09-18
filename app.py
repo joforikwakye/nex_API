@@ -2,7 +2,7 @@ from crypt import methods
 from tkinter import Image
 from turtle import position
 from flask import Flask, jsonify, request
-from models import Aces, Candidates, session, Students, Images
+from models import Aces, Biomed, Candidates, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import Candidates
 
@@ -205,6 +205,77 @@ def get_aces_gensec():
 
 #end of all aces routes
 
+
+#Biomed routes
+@app.route('/biomed_presidents', methods=['GET'])
+def get_biomed_presidents():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Biomed, Images).join(Biomed).filter(
+            Students.student_id == Biomed.student_id, Students.student_id == Images.student_id, Biomed.position == "president")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Biomed.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+@app.route('/biomed_gensec', methods=['GET'])
+def get_biomed_gensec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Biomed, Images).join(Biomed).filter(
+            Students.student_id == Biomed.student_id, Students.student_id == Images.student_id, Biomed.position == "general secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Biomed.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+@app.route('/biomed_finsec', methods=['GET'])
+def get_biomed_finsec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Biomed, Images).join(Biomed).filter(
+            Students.student_id == Biomed.student_id, Students.student_id == Images.student_id, Biomed.position == "financial secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Biomed.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+#end of biomed routes
 
 @app.route('/candidate/<id>', methods=['GET'])
 def get_candidate(id):
