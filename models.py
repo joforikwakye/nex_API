@@ -1,4 +1,3 @@
-from turtle import position
 from sqlalchemy import create_engine, String, Integer, Date, ForeignKey, Column
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 import psycopg2
@@ -44,6 +43,7 @@ class Students(Base):
     child2 = relationship("Candidates", uselist=False)
     child3 = relationship("Aces", uselist=False)
     child4 = relationship("Biomed", uselist=False)
+    child5 = relationship("Gesa", uselist=False)
 
 
     def __init__(self, username, first_name, last_name, gender, phone_number, dob, level, email, college, department):
@@ -100,6 +100,16 @@ class Biomed(Base):
     position = Column('position', String(255), nullable=False)
 
     parent = relationship("Students", back_populates="child4")
+
+
+class Gesa(Base):
+    __tablename__ = "gesa"
+
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child5")
     
-    def __init__(self):
+    def __init__(self, position):
         self.position = position
