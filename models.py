@@ -80,7 +80,14 @@ class Candidates(Base):
     parent = relationship("Students", back_populates="child2")
 
 
+class Aces(Base):
+    __tablename__ = "aces"
 
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child2")
     
     
     def __init__(self):
