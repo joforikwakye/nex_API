@@ -134,9 +134,31 @@ def get_fin_sec():
     except Exception as e:
         print(e)
 
-
+#All aces routes
 @app.route('/aces_presidents', methods=['GET'])
 def get_aces_presidents():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Aces, Images).join(Aces).filter(
+            Students.student_id == Aces.student_id, Students.student_id == Images.student_id, Aces.position == "president")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Aces.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+@app.route('/aces_finsec', methods=['GET'])
+def get_aces_finsec():
     returnInfo = []
     d = {}
     try:
@@ -158,7 +180,30 @@ def get_aces_presidents():
         print(e)
 
 
+@app.route('/aces_gensec', methods=['GET'])
+def get_aces_gensec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Aces, Images).join(Aces).filter(
+            Students.student_id == Aces.student_id, Students.student_id == Images.student_id, Aces.position == "general secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Aces.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
 
+
+#end of all aces routes
 
 
 @app.route('/candidate/<id>', methods=['GET'])
