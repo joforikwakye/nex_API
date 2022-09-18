@@ -2,7 +2,7 @@ from crypt import methods
 from tkinter import Image
 from turtle import position
 from flask import Flask, jsonify, request
-from models import Aces, Biomed, Candidates, session, Students, Images
+from models import Aces, Biomed, Candidates, Gesa, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import Candidates
 
@@ -276,6 +276,76 @@ def get_biomed_finsec():
         print(e)
 
 #end of biomed routes
+
+
+#Gesa routes
+@app.route('/gesa_presidents', methods=['GET'])
+def get_gesa_presidents():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Gesa, Images).join(Gesa).filter(
+            Students.student_id == Gesa.student_id, Students.student_id == Images.student_id, Gesa.position == "president")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Gesa.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+    
+@app.route('/gesa_gensec', methods=['GET'])
+def get_gesa_gensec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Gesa, Images).join(Gesa).filter(
+            Students.student_id == Gesa.student_id, Students.student_id == Images.student_id, Gesa.position == "general secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Gesa.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
+
+
+@app.route('/gesa_finsec', methods=['GET'])
+def get_gesa_finsec():
+    returnInfo = []
+    d = {}
+    try:
+        persons = session.query(Students, Gesa, Images).join(Gesa).filter(
+            Students.student_id == Gesa.student_id, Students.student_id == Images.student_id, Gesa.position == "financial secretary")
+        for person in persons:
+            returnInfo.append(
+                {
+                    "student_position": person.Gesa.position,
+                    "student_id": person.Students.student_id,
+                    "firstname": person.Students.first_name,
+                    "lastname": person.Students.last_name,
+                    "imageurl": person.Images.image_url
+                }
+            )
+            d['results'] = returnInfo
+        return jsonify(d['results'])
+    except Exception as e:
+        print(e)
 
 @app.route('/candidate/<id>', methods=['GET'])
 def get_candidate(id):
