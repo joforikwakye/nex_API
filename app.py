@@ -1,8 +1,5 @@
-from crypt import methods
-from tkinter import Image
-from turtle import position
 from flask import Flask, jsonify, request
-from models import Aces, Biomed, Candidates, Gesa, session, Students, Images
+from models import Aces, AcesVotes, Biomed, Candidates, Gesa, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import Candidates
 
@@ -32,6 +29,20 @@ def login():
     else:
         d['status'] = 'Username does not exist'
         return jsonify(d)
+
+# gets the votes for aces and stores it in the database
+@app.route('/votes', methods=['POST'])
+def votes():
+    d = {}
+    votes = session.query(AcesVotes).all()
+
+    if votes != None:
+        voted_student_id = request.json['voted_student_id', 'voted_candidate_id']
+        session.add(voted_student_id)
+        session.commit()
+
+        d['status'] = "votes recorded"
+        return jsonify(d['status'])
 
 
 @app.route('/student/<id>', methods=['GET'])

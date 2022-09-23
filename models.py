@@ -113,3 +113,11 @@ class Gesa(Base):
     
     def __init__(self, position):
         self.position = position
+
+
+class AcesVotes(Base):
+    __tablename__ = "aces_votes"
+
+    id = Column('id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    candidate_id = Column('candidate_id', Integer, ForeignKey("candidate.candidate_id"))
