@@ -41,6 +41,9 @@ class Students(Base):
     # one-to-one mapping
     child1 = relationship("Images", uselist=False)
     child2 = relationship("Candidates", uselist=False)
+    child3 = relationship("Aces", uselist=False)
+    child4 = relationship("Biomed", uselist=False)
+    child5 = relationship("Gesa", uselist=False)
 
 
     def __init__(self, username, first_name, last_name, gender, phone_number, dob, level, email, college, department):
@@ -78,7 +81,51 @@ class Candidates(Base):
     position = Column('position', String(255), nullable = 'False')
 
     parent = relationship("Students", back_populates="child2")
+
+
+class Aces(Base):
+    __tablename__ = "aces"
+
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child3")
+
+class Biomed(Base):
+    __tablename__ = "biomed"
+
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child4")
+
+
+class Gesa(Base):
+    __tablename__ = "gesa"
+
+    candidate_id = Column('candidate_id', Integer, primary_key=True)
+    student_id = Column('student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255), nullable=False)
+
+    parent = relationship("Students", back_populates="child5")
     
-    
-    def __init__(self):
-        pass
+    def __init__(self, position):
+        self.position = position
+
+
+
+
+class AcesVotes(Base):
+    __tablename__ = "aces_votes"
+
+    vote_id = Column('vote_id', Integer, primary_key=True)
+    candidate_student_id = Column('candidate_student_id', Integer, ForeignKey("aces.candidate_id"))
+    voter_student_id = Column('voter_student_id', Integer, ForeignKey("student.student_id"))
+    position = Column('position', String(255))
+
+    def __init__(self,candidate_student_id,voter_student_id,position):
+        self.candidate_student_id = candidate_student_id
+        self.voter_student_id = voter_student_id
+        self.position = position
