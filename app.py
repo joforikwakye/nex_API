@@ -1,3 +1,4 @@
+from unittest import result
 from flask import Flask, jsonify, request
 from models import Aces, AcesVotes, Biomed, Candidates, Gesa, session, Students, Images
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -31,18 +32,24 @@ def login():
         return jsonify(d)
 
 # gets the votes for aces and stores it in the database
-@app.route('/votes', methods=['POST'])
+
+
+# records the votes stores it in the database
+@app.route('/aces_votes', methods=['POST'])
 def votes():
-    d = {}
-    votes = session.query(AcesVotes).all()
-
-    if votes != None:
-        voted_student_id = request.json['voted_student_id', 'voted_candidate_id']
-        session.add(voted_student_id)
-        session.commit()
-
-        d['status'] = "votes recorded"
-        return jsonify(d['status'])
+    candidate_id = request.json['candidate_id']
+    position = request.json["position"]
+    voter_student_id = request.json["voter_student_id"]
+    vote = AcesVotes(candidate_id,voter_student_id,position)
+    session.add(vote)
+    session.commit()
+    responseVotes = session.query(AcesVotes).all()
+    result = [{
+        'status':  "Votes recorded",
+        'voter_id': vote.voter_student_id,
+        'candidate_id':vote.candidate_student_id
+    } for vote in responseVotes]
+    return jsonify(result)
 
 
 @app.route('/student/<id>', methods=['GET'])
